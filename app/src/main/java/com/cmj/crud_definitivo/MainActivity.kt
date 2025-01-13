@@ -1,5 +1,6 @@
 package com.cmj.crud_definitivo
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmj.crud_definitivo.ui.CrearCuentaActivity
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
@@ -44,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Inicio(nombre: String, modifier: Modifier = Modifier) {
+    val contexto = LocalContext.current
     val colorBoton = ButtonDefaults.buttonColors(
         containerColor = Purple80
     )
@@ -73,7 +77,10 @@ fun Inicio(nombre: String, modifier: Modifier = Modifier) {
                 .width(200.dp),
             colors = colorBoton,
 
-            onClick = {}
+            onClick = {
+                val intent = Intent(contexto, CrearCuentaActivity::class.java)
+                contexto.startActivity(intent)
+            }
         ) { Text("Registrarse", color = Purple40) }
     }
 }
