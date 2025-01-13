@@ -56,4 +56,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Glide
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+
+    //Firebase
+    implementation(libs.firebase.database.ktx)
+    implementation(platform(libs.firebase.bom))
+    implementation ("com.google.android.gms:play-services-auth:20.1.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1")
+
+    //AppWriteStorage
+    implementation("io.appwrite:sdk-for-kotlin:5.0.1")
 }
