@@ -13,6 +13,11 @@
         android:theme="@style/Theme.CRUDDefinitivo"
         tools:targetApi="31">
         <activity
+            android:name=".vistas.ListadoGuitarrasActivity"
+            android:exported="false"
+            android:label="@string/title_activity_listado_guitarras"
+            android:theme="@style/Theme.CRUDDefinitivo" />
+        <activity
             android:name=".vistas.IniciarSesionActivity"
             android:exported="false"
             android:label="@string/title_activity_iniciar_sesion"
