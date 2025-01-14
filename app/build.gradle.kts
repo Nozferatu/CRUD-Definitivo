@@ -59,6 +59,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation (libs.androidx.constraintlayout.compose)
 
     //Glide
     //implementation ("com.github.bumptech.glide:glide:4.12.0")

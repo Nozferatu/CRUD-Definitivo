@@ -5,9 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,12 +18,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.Guitarra
@@ -88,31 +85,46 @@ fun Guitarra(guitarra: Guitarra) {
             .padding(vertical = 10.dp, horizontal = 20.dp)
             .fillMaxWidth()
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center
+        ConstraintLayout(
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
         ) {
-            Row{
-                Text(guitarra.nombre)
+            val (
+                imagen, nombre, descripcion,
+                marca, modelo, precio,
+                rating
+            ) = createRefs()
 
-                SubcomposeAsyncImage(
-                    model = URL,
-                    contentDescription = "Imagen",
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .size(100.dp),
-                    contentScale = ContentScale.Crop,
-                    loading = { CircularProgressIndicator() },
-                    error = {
-                        Image(
-                            painter = painterResource(R.drawable.imagen_guitarra_default),
-                            contentDescription = "Error"
-                        )
-                    }
-                )
-            }
+            SubcomposeAsyncImage(
+                modifier = Modifier
+                    .size(100.dp)
+                    .constrainAs(imagen){
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        bottom.linkTo(parent.bottom)
+                    },
+                model = URL,
+                contentDescription = "Imagen",
+                contentScale = ContentScale.Crop,
+                loading = { CircularProgressIndicator() },
+                error = {
+                    Image(
+                        painter = painterResource(R.drawable.imagen_guitarra_default),
+                        contentDescription = "Error"
+                    )
+                }
+            )
+
+            /*Text(
+                modifier = Modifier
+                    .padding(start = 10.dp),
+                text = guitarra.nombre
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp),
+                text = guitarra.descripcion
+            )*/
         }
     }
 }
