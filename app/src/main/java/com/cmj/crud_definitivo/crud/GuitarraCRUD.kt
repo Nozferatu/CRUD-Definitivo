@@ -12,14 +12,14 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
 class GuitarraCRUD(
-    var contexto: Context,
-    var databaseRef: DatabaseReference
+    private var contexto: Context,
+    private var databaseRef: DatabaseReference
 ) {
     fun persistirGuitarra(guitarra: Guitarra){
         Looper.prepare()
 
-        if(guitarra.key?.isNotBlank() == true){
-            databaseRef.child("guitarras").child(guitarra.key!!).setValue(guitarra)
+        if(guitarra.key.isNotBlank()){
+            databaseRef.child("guitarras").child(guitarra.key).setValue(guitarra)
 
             hacerTostada(contexto, "Guitarra modificada")
         }else{
