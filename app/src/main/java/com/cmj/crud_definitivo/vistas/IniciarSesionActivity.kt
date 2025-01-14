@@ -121,12 +121,11 @@ fun InicioSesion(modifier: Modifier = Modifier, usuarioCRUD: UsuarioCRUD) {
                         usuarioCRUD.buscarUsuario(sesion, true) { usuario ->
                             if (usuario != null) {
                                 hacerTostada(contexto, "Inicio de sesión correcto")
-                                /*
-                                val intent = Intent(contexto, HomeActivity::class.java)
+
+                                val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
                                 intent.putExtra("sesion", usuario)
 
                                 contexto.startActivity(intent)
-                                */
                             }
                         }
                     }
