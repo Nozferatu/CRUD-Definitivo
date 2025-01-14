@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cmj.crud_definitivo.crud.UsuarioCRUD
 import com.cmj.crud_definitivo.entity.Usuario
@@ -100,6 +101,7 @@ fun InicioSesion(modifier: Modifier = Modifier, usuarioCRUD: UsuarioCRUD) {
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true
         )
 
