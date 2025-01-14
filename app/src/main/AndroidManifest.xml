@@ -13,7 +13,12 @@
         android:theme="@style/Theme.CRUDDefinitivo"
         tools:targetApi="31">
         <activity
-            android:name=".ui.CrearCuentaActivity"
+            android:name=".vistas.IniciarSesionActivity"
+            android:exported="false"
+            android:label="@string/title_activity_iniciar_sesion"
+            android:theme="@style/Theme.CRUDDefinitivo" />
+        <activity
+            android:name=".vistas.CrearCuentaActivity"
             android:exported="false"
             android:label="@string/title_activity_crear_cuenta"
             android:theme="@style/Theme.CRUDDefinitivo" />

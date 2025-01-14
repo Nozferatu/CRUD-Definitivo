@@ -20,18 +20,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmj.crud_definitivo.ui.CrearCuentaActivity
+import com.cmj.crud_definitivo.vistas.CrearCuentaActivity
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
+import com.cmj.crud_definitivo.vistas.IniciarSesionActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             CRUDDefinitivoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -69,7 +70,10 @@ fun Inicio(nombre: String, modifier: Modifier = Modifier) {
                .width(200.dp),
            colors = colorBoton,
 
-           onClick = {}
+           onClick = {
+                val intent = Intent(contexto, IniciarSesionActivity::class.java)
+                contexto.startActivity(intent)
+           }
         ) { Text("Iniciar sesión", color = Purple40) }
 
         Button(
@@ -82,13 +86,5 @@ fun Inicio(nombre: String, modifier: Modifier = Modifier) {
                 contexto.startActivity(intent)
             }
         ) { Text("Registrarse", color = Purple40) }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 400, heightDp = 900)
-@Composable
-fun InicioPreview() {
-    CRUDDefinitivoTheme {
-        Inicio("humano")
     }
 }
