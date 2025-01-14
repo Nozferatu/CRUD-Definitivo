@@ -21,7 +21,7 @@ val transicion = DrawableTransitionOptions.withCrossFade(500)
 fun opcionesGlide(context: Context): RequestOptions {
     val options = RequestOptions()
         .placeholder(animacion_carga(context))
-        //.fallback(R.drawable.imagen_guitarra_default)
+        .fallback(R.drawable.imagen_guitarra_default)
         .error(R.drawable.ic_launcher_foreground)
     return options
 }
