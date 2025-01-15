@@ -178,7 +178,6 @@ fun Guitarra(guitarra: Guitarra) {
 
             Text(
                 modifier = Modifier
-                    .padding(start = 10.dp)
                     .constrainAs(precio){
                         bottom.linkTo(parent.bottom)
                         end.linkTo(parent.end)
