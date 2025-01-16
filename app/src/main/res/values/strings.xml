@@ -4,4 +4,5 @@
     <string name="title_activity_iniciar_sesion">IniciarSesionActivity</string>
     <string name="title_activity_listado_guitarras">ListadoGuitarrasActivity</string>
     <string name="title_activity_persistir_guitarra">PersistirGuitarraActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
 </resources>
