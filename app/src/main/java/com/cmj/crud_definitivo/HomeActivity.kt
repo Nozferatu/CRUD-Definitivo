@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
+import com.cmj.crud_definitivo.vistas.ListadoGuitarrasActivity
 import com.cmj.crud_definitivo.vistas.PersistirGuitarraActivity
 
 class HomeActivity : ComponentActivity() {
@@ -46,6 +47,9 @@ class HomeActivity : ComponentActivity() {
 @Composable
 fun Home(modifier: Modifier = Modifier) {
     val contexto = LocalContext.current
+    val modifierBoton = Modifier
+        .width(200.dp)
+        .padding(vertical = 10.dp)
     val colorBoton = ButtonDefaults.buttonColors(
         containerColor = Purple80
     )
@@ -60,8 +64,7 @@ fun Home(modifier: Modifier = Modifier) {
             fontSize = 20.sp
         )
         Button(
-            modifier = Modifier
-                .width(200.dp),
+            modifier = modifierBoton,
             colors = colorBoton,
 
             onClick = {
@@ -69,6 +72,16 @@ fun Home(modifier: Modifier = Modifier) {
                 contexto.startActivity(intent)
             }
         ) { Text("Agregar guitarra", color = Purple40) }
+
+        Button(
+            modifier = modifierBoton,
+            colors = colorBoton,
+
+            onClick = {
+                val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
+                contexto.startActivity(intent)
+            }
+        ) { Text("Listar guitarras", color = Purple40) } //Temporal
     }
 }
 
