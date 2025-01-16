@@ -28,8 +28,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cmj.crud_definitivo.HomeActivity
 import com.cmj.crud_definitivo.crud.UsuarioCRUD
 import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.hacerTostada
@@ -88,6 +91,13 @@ fun InicioSesion(modifier: Modifier = Modifier, usuarioCRUD: UsuarioCRUD) {
         .padding(horizontal = 40.dp)
         .verticalScroll(scrollState)
     ) {
+        Text(modifier = Modifier
+            .padding(vertical = 20.dp),
+            text = "Inicio de sesión",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
         OutlinedTextField(
             modifier = modifierInput,
             value = nombre,
@@ -124,7 +134,7 @@ fun InicioSesion(modifier: Modifier = Modifier, usuarioCRUD: UsuarioCRUD) {
                             if (usuario != null) {
                                 hacerTostada(contexto, "Inicio de sesión correcto")
 
-                                val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
+                                val intent = Intent(contexto, HomeActivity::class.java)
                                 intent.putExtra("sesion", usuario)
 
                                 contexto.startActivity(intent)

@@ -27,8 +27,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.cmj.crud_definitivo.crud.UsuarioCRUD
 import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.hacerTostada
@@ -88,6 +90,13 @@ fun CrearCuenta(modifier: Modifier = Modifier, usuarioCRUD: UsuarioCRUD) {
         .padding(horizontal = 40.dp)
         .verticalScroll(scrollState)
     ) {
+        Text(modifier = Modifier
+            .padding(vertical = 20.dp),
+            text = "Registro",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
         OutlinedTextField(
             modifier = modifierInput,
             value = nombre,
