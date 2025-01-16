@@ -16,8 +16,6 @@ class GuitarraCRUD(
     private var databaseRef: DatabaseReference
 ) {
     fun persistirGuitarra(guitarra: Guitarra){
-        Looper.prepare()
-
         if(guitarra.key.isNotBlank()){
             databaseRef.child("guitarras").child(guitarra.key).setValue(guitarra)
 
