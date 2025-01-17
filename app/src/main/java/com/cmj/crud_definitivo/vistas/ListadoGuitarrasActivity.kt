@@ -1,10 +1,12 @@
 package com.cmj.crud_definitivo.vistas
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ import coil.compose.SubcomposeAsyncImage
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
+import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.entity.Guitarra
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.google.firebase.Firebase
@@ -48,6 +51,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.database.database
 
 class ListadoGuitarrasActivity : ComponentActivity() {
+    private var accion: AccionGuitarra? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -63,12 +68,15 @@ class ListadoGuitarrasActivity : ComponentActivity() {
             listaGuitarras.addAll(guitarras)
         }
 
+        accion = intent.getSerializableExtra("accion") as AccionGuitarra?
+
         setContent {
             CRUDDefinitivoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     ListadoGuitarras(
                         modifier = Modifier.padding(innerPadding),
-                        listaGuitarras
+                        listaGuitarras,
+                        accion
                     )
                 }
             }
@@ -79,17 +87,19 @@ class ListadoGuitarrasActivity : ComponentActivity() {
 @Composable
 fun ListadoGuitarras(
     modifier: Modifier = Modifier,
-    guitarras: SnapshotStateList<Guitarra>
+    guitarras: SnapshotStateList<Guitarra>,
+    accion: AccionGuitarra?
 ) {
     LazyColumn(modifier = modifier) {
         items(guitarras) { guitarra ->
-            Guitarra(guitarra)
+            Guitarra(guitarra, accion)
         }
     }
 }
 
 @Composable
-fun Guitarra(guitarra: Guitarra) {
+fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?) {
+    val contexto = LocalContext.current
     val rating = remember { mutableFloatStateOf(guitarra.rating) }
     val url:String?=when(guitarra.urlImagen){
         "" -> null
@@ -100,6 +110,14 @@ fun Guitarra(guitarra: Guitarra) {
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
             .fillMaxWidth()
+            .clickable {
+                if(accion != null){
+                    val intent = Intent(contexto, PersistirGuitarraActivity::class.java)
+                    intent.putExtra("guitarraIntent", guitarra)
+
+                    contexto.startActivity(intent)
+                }
+            }
     ) {
         ConstraintLayout(
             modifier = Modifier
@@ -226,12 +244,12 @@ fun StarRatingBar(
                 contentDescription = null,
                 tint = iconTintColor,
                 modifier = Modifier
-                    .selectable(
+                    /*.selectable(
                         selected = isSelected,
                         onClick = {
                             onRatingChanged(i.toFloat())
                         }
-                    )
+                    )*/
                     .width(starSize).height(starSize)
             )
 
