@@ -1,4 +1,4 @@
-package com.cmj.crud_definitivo
+package com.cmj.crud_definitivo.vistas.usuario
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
@@ -63,6 +64,7 @@ fun Home(modifier: Modifier = Modifier) {
             text = "¿Qué acción desde realizar?",
             fontSize = 20.sp
         )
+
         Button(
             modifier = modifierBoton,
             colors = colorBoton,
@@ -79,9 +81,20 @@ fun Home(modifier: Modifier = Modifier) {
 
             onClick = {
                 val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
+                intent.putExtra("accion", AccionGuitarra.MODIFICAR)
                 contexto.startActivity(intent)
             }
-        ) { Text("Listar guitarras", color = Purple40) } //Temporal
+        ) { Text("Modificar guitarra", color = Purple40) }
+
+        Button(
+            modifier = modifierBoton,
+            colors = colorBoton,
+
+            onClick = {
+                val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
+                contexto.startActivity(intent)
+            }
+        ) { Text("Listar guitarras", color = Purple40) }
     }
 }
 

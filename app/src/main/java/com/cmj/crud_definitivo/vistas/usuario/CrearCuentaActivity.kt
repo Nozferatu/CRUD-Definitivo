@@ -1,4 +1,4 @@
-package com.cmj.crud_definitivo.vistas
+package com.cmj.crud_definitivo.vistas.usuario
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

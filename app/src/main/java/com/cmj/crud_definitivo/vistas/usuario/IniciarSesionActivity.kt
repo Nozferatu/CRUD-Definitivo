@@ -1,4 +1,4 @@
-package com.cmj.crud_definitivo.vistas
+package com.cmj.crud_definitivo.vistas.usuario
 
 import android.content.Intent
 import android.os.Bundle
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmj.crud_definitivo.HomeActivity
 import com.cmj.crud_definitivo.crud.UsuarioCRUD
 import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.hacerTostada
