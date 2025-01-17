@@ -22,11 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cmj.crud_definitivo.vistas.CrearCuentaActivity
+import com.cmj.crud_definitivo.vistas.usuario.CrearCuentaActivity
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
-import com.cmj.crud_definitivo.vistas.IniciarSesionActivity
+import com.cmj.crud_definitivo.vistas.usuario.IniciarSesionActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
