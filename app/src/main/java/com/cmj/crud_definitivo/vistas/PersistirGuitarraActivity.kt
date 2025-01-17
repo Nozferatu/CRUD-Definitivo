@@ -2,7 +2,6 @@ package com.cmj.crud_definitivo.vistas
 
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -26,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil.compose.SubcomposeAsyncImage
 import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
@@ -49,25 +50,25 @@ import com.cmj.crud_definitivo.ui.theme.Purple80
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.database
-import io.appwrite.Client
-import io.appwrite.ID
-import io.appwrite.models.InputFile
-import io.appwrite.services.Storage
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class PersistirGuitarraActivity : ComponentActivity() {
+    private var guitarraIntent: Guitarra? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         FirebaseApp.initializeApp(applicationContext)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        guitarraIntent = intent.getSerializableExtra("guitarraIntent") as Guitarra?
+
         setContent {
             CRUDDefinitivoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PersistirGuitarra(
-                        guitarra = Guitarra(),
+                        guitarra = guitarraIntent,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -77,26 +78,21 @@ class PersistirGuitarraActivity : ComponentActivity() {
 }
 
 @Composable
-fun PersistirGuitarra(guitarra: Guitarra, modifier: Modifier = Modifier) {
+fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier) {
     val contexto = LocalContext.current
-    val contentResolver = contexto.contentResolver
     val coroutineScope = rememberCoroutineScope()
 
     val colorBoton = ButtonDefaults.buttonColors(
         containerColor = Purple80
     )
 
-    //Tema DB
-    val databaseRef = Firebase.database.reference
-    val guitarraCRUD = GuitarraCRUD(contexto, databaseRef)
-
     //Tema AppWrite
     val id_proyecto = "6762fbc00010d599c17c"
     val id_bucket = "6762fbed003a60f5f03f"
-    val client = Client()
-        .setEndpoint("https://cloud.appwrite.io/v1")
-        .setProject(id_proyecto)
-    val bucket = Storage(client)
+
+    //Tema DB
+    val databaseRef = Firebase.database.reference
+    val guitarraCRUD = GuitarraCRUD(contexto, databaseRef, id_proyecto, id_bucket)
 
     //Tema inputs
     val modifierInput = Modifier
@@ -112,17 +108,23 @@ fun PersistirGuitarra(guitarra: Guitarra, modifier: Modifier = Modifier) {
         url_imagen = uri
     }
 
-    var nombre: String by rememberSaveable { mutableStateOf("") }
-    var descripcion: String by rememberSaveable { mutableStateOf("") }
-    var marca: String by rememberSaveable { mutableStateOf("") }
-    var modelo: String by rememberSaveable { mutableStateOf("") }
-    var precio: String by rememberSaveable { mutableStateOf("") }
-    val rating = remember { mutableFloatStateOf(guitarra.rating) }
+    var nombre: String by rememberSaveable { mutableStateOf(guitarra?.nombre ?: "") }
+    var descripcion: String by rememberSaveable { mutableStateOf(guitarra?.descripcion ?: "") }
+    var marca: String by rememberSaveable { mutableStateOf(guitarra?.marca ?: "") }
+    var modelo: String by rememberSaveable { mutableStateOf(guitarra?.modelo ?: "") }
+    var precio: String by rememberSaveable { mutableStateOf(guitarra?.precio?.toString() ?: "") }
+    val rating = remember { mutableFloatStateOf(guitarra?.rating ?: 5f) }
 
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(horizontal = 20.dp)
     ){
+        LaunchedEffect(Unit) {
+            if(guitarra != null){
+                url_imagen = guitarra.urlImagen.toUri()
+            }
+        }
+
         OutlinedTextField(
             modifier = modifierInput,
             value = nombre,
@@ -209,37 +211,22 @@ fun PersistirGuitarra(guitarra: Guitarra, modifier: Modifier = Modifier) {
                         .append(calendar.get(Calendar.DATE)).toString()
 
                     coroutineScope.launch{
-                        var nombreArchivo = ""
-                        val inputStream = contentResolver.openInputStream(url_imagen!!)
-                        val aux = contentResolver.query(url_imagen!!, null, null, null, null)
-                        aux.use {
-                            if (it!!.moveToFirst()) {
-                                // Obtener el nombre del archivo
-                                val nombreIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                                if (nombreIndex != -1) {
-                                    nombreArchivo = it.getString(nombreIndex)
-                                }
+                        val idFile: String
+
+                        if(guitarra != null){
+                            if(guitarra.urlImagen != url_imagen.toString()){
+                                idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
+                            }else{
+                                idFile = guitarra.idImagen
                             }
+                        }else{
+                            idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
                         }
-                        val mimeType: String = contentResolver.getType(url_imagen!!).toString()
-
-                        val fileInput = InputFile.fromBytes(
-                            bytes = inputStream?.readBytes() ?: byteArrayOf(),
-                            filename = nombreArchivo,
-                            mimeType = mimeType
-                        )
-
-                        val idFile = ID.unique()
-                        bucket.createFile(
-                            bucketId = id_bucket,
-                            fileId = idFile,
-                            file = fileInput
-                        )
 
                         val urlImagen =
                             "https://cloud.appwrite.io/v1/storage/buckets/$id_bucket/files/$idFile/preview?project=$id_proyecto"
 
-                        val guitarraAPersistir = Guitarra("",
+                        val guitarraAPersistir = Guitarra(guitarra?.key ?: "",
                             fechaActual,
                             idFile,
                             urlImagen,
