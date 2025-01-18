@@ -70,7 +70,8 @@ class PersistirGuitarraActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PersistirGuitarra(
                         guitarra = guitarraIntent,
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        this
                     )
                 }
             }
@@ -79,7 +80,7 @@ class PersistirGuitarraActivity : ComponentActivity() {
 }
 
 @Composable
-fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier) {
+fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier, activity: ComponentActivity) {
     val contexto = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -241,11 +242,19 @@ fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier) {
                                 )
 
                                 guitarraCRUD.persistirGuitarra(guitarraAPersistir)
+                                activity.finish()
                             }
                         }else hacerTostada(contexto, "Hay que elegir una imagen")
                     }else hacerTostada(contexto, "El nombre no puede estar vacío")
                 }
-            ) { Text("Agregar guitarra", color = Purple40) }
+            ) { Text(
+                text = when(guitarra) {
+                    null -> { "Agregar guitarra" }
+                    else -> { "Modificar guitarra" }
+                },
+                color = Purple40
+            )
+            }
         }
     }
 }
