@@ -1,8 +1,10 @@
 package com.cmj.crud_definitivo.crud
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Log
 import com.cmj.crud_definitivo.entity.Guitarra
 import com.cmj.crud_definitivo.hacerTostada
 import com.google.firebase.Firebase
@@ -15,6 +17,8 @@ import io.appwrite.Client
 import io.appwrite.ID
 import io.appwrite.models.InputFile
 import io.appwrite.services.Storage
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class GuitarraCRUD(
     private var contexto: Context,
@@ -22,13 +26,19 @@ class GuitarraCRUD(
     private var idProyecto: String? = "",
     private var idBucket: String? = ""
 ) {
-    suspend fun guardarImagenGuitarra(uriImagen: Uri?): String{
-        val contentResolver = contexto.contentResolver
-        val client = Client()
+    private var contentResolver: ContentResolver
+    private var client: Client
+    private var bucket: Storage
+
+    init {
+        contentResolver = contexto.contentResolver
+        client = Client()
             .setEndpoint("https://cloud.appwrite.io/v1")
             .setProject(idProyecto!!)
-        val bucket = Storage(client)
+        bucket = Storage(client)
+    }
 
+    suspend fun guardarImagenGuitarra(uriImagen: Uri?): String{
         var nombreArchivo = ""
         val inputStream = contentResolver.openInputStream(uriImagen!!)
         val aux = contentResolver.query(uriImagen, null, null, null, null)
@@ -72,6 +82,22 @@ class GuitarraCRUD(
 
             hacerTostada(contexto, "Guitarra creada")
         }
+    }
+
+    fun borrarGuitarra(guitarra: Guitarra){
+        //Se borra la imagen de AppWrite
+        GlobalScope.launch {
+            bucket.deleteFile(
+                bucketId = idBucket!!,
+                fileId = guitarra.idImagen
+            )
+
+            Log.d("AppWrite", "Imagen borrada: ${guitarra.urlImagen}")
+        }
+
+        //Se borra del Firebase
+        databaseRef.child("guitarras").child(guitarra.key).removeValue()
+        hacerTostada(contexto, "Guitarra borrada")
     }
 
     fun recuperarGuitarras(onDataReady: (List<Guitarra>) -> Unit) {

@@ -1,7 +1,9 @@
 package com.cmj.crud_definitivo.vistas
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,6 +47,7 @@ import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.entity.Guitarra
+import com.cmj.crud_definitivo.hacerTostada
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
@@ -52,6 +55,7 @@ import com.google.firebase.database.database
 
 class ListadoGuitarrasActivity : ComponentActivity() {
     private var accion: AccionGuitarra? = null
+    private lateinit var guitarraCRUD: GuitarraCRUD
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +63,19 @@ class ListadoGuitarrasActivity : ComponentActivity() {
 
         val listaGuitarras = mutableStateListOf<Guitarra>()
 
+        //Tema AppWrite
+        val id_proyecto = "6762fbc00010d599c17c"
+        val id_bucket = "6762fbed003a60f5f03f"
+
+        //Tema Firebase
         FirebaseApp.initializeApp(applicationContext)
         val dbRef = Firebase.database.reference
-        val guitarraCRUD = GuitarraCRUD(applicationContext, dbRef)
+        guitarraCRUD = GuitarraCRUD(applicationContext, dbRef, id_proyecto, id_bucket)
 
         guitarraCRUD.recuperarGuitarras { guitarras ->
+            for(guitarra in guitarras){
+                Log.d("Debug", guitarra.toString())
+            }
             listaGuitarras.clear()
             listaGuitarras.addAll(guitarras)
         }
@@ -76,6 +88,7 @@ class ListadoGuitarrasActivity : ComponentActivity() {
                     ListadoGuitarras(
                         modifier = Modifier.padding(innerPadding),
                         listaGuitarras,
+                        guitarraCRUD,
                         accion
                     )
                 }
@@ -88,18 +101,20 @@ class ListadoGuitarrasActivity : ComponentActivity() {
 fun ListadoGuitarras(
     modifier: Modifier = Modifier,
     guitarras: SnapshotStateList<Guitarra>,
+    guitarraCRUD: GuitarraCRUD,
     accion: AccionGuitarra?
 ) {
     LazyColumn(modifier = modifier) {
         items(guitarras) { guitarra ->
-            Guitarra(guitarra, accion)
+            Guitarra(guitarra, accion, guitarraCRUD)
         }
     }
 }
 
 @Composable
-fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?) {
+fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: GuitarraCRUD) {
     val contexto = LocalContext.current
+
     val rating = remember { mutableFloatStateOf(guitarra.rating) }
     val url:String?=when(guitarra.urlImagen){
         "" -> null
@@ -112,10 +127,29 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?) {
             .fillMaxWidth()
             .clickable {
                 if(accion != null){
-                    val intent = Intent(contexto, PersistirGuitarraActivity::class.java)
-                    intent.putExtra("guitarraIntent", guitarra)
+                    when(accion){
+                        AccionGuitarra.MODIFICAR -> {
+                            val intent = Intent(contexto, PersistirGuitarraActivity::class.java)
+                            intent.putExtra("guitarraIntent", guitarra)
 
-                    contexto.startActivity(intent)
+                            contexto.startActivity(intent)
+                        }
+                        AccionGuitarra.BORRAR -> {
+                            val builder: AlertDialog.Builder = AlertDialog.Builder(contexto)
+                            builder
+                                .setTitle("Confirmación")
+                                .setMessage("¿Está seguro de que quiere borrar esta guitarra?")
+                                .setPositiveButton("Sí") { _, _ ->
+                                    guitarraCRUD.borrarGuitarra(guitarra)
+                                }
+                                .setNegativeButton("No") { _, _ ->
+                                    hacerTostada(contexto, "Cancelado")
+                                }
+
+                            val dialog: AlertDialog = builder.create()
+                            dialog.show()
+                        }
+                    }
                 }
             }
     ) {
@@ -129,6 +163,8 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?) {
                 marca, modelo, precio,
                 ratingBar
             ) = createRefs()
+
+            Log.d("Debug", url!!)
 
             SubcomposeAsyncImage(
                 modifier = Modifier

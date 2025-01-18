@@ -92,6 +92,17 @@ fun Home(modifier: Modifier = Modifier) {
 
             onClick = {
                 val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
+                intent.putExtra("accion", AccionGuitarra.BORRAR)
+                contexto.startActivity(intent)
+            }
+        ) { Text("Borrar guitarra", color = Purple40) }
+
+        Button(
+            modifier = modifierBoton,
+            colors = colorBoton,
+
+            onClick = {
+                val intent = Intent(contexto, ListadoGuitarrasActivity::class.java)
                 contexto.startActivity(intent)
             }
         ) { Text("Listar guitarras", color = Purple40) }
