@@ -61,6 +61,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation (libs.androidx.constraintlayout.compose)
 
+    // Extended Icons
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
     //Glide
     //implementation ("com.github.bumptech.glide:glide:4.12.0")
 

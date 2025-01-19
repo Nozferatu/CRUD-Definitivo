@@ -167,9 +167,10 @@ fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier, activi
             singleLine = true
         )
 
-        StarRatingBar(modifier = Modifier,
-            maxStars = 5,
+        RatingBar(modifier = Modifier,
+            stars = 5,
             rating = rating.floatValue,
+            canChangeRating = true,
             onRatingChanged = {
                 rating.floatValue = it
             }

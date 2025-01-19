@@ -8,29 +8,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarHalf
+import androidx.compose.material.icons.rounded.StarOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -40,12 +44,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,7 +99,17 @@ class ListadoGuitarrasActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding),
                         listaGuitarras,
                         guitarraCRUD,
-                        accion
+                        accion,
+                        ordenar = { opcion ->
+                            when(opcion){
+                                "Ascendente" -> listaGuitarras.sortBy { it.rating }
+                                "Descendente" -> listaGuitarras.sortByDescending { it.rating }
+                            }
+
+                            for(guitarra in listaGuitarras){
+                                Log.d("Debug", guitarra.toString())
+                            }
+                        }
                     )
                 }
             }
@@ -110,16 +122,16 @@ fun ListadoGuitarras(
     modifier: Modifier = Modifier,
     guitarras: SnapshotStateList<Guitarra>,
     guitarraCRUD: GuitarraCRUD,
-    accion: AccionGuitarra?
+    accion: AccionGuitarra?,
+    ordenar: (opcion: String) -> Unit
 ) {
     val modifierInput = Modifier
         .padding(vertical = 10.dp)
-        .wrapContentHeight()
         .fillMaxWidth()
+        .wrapContentHeight()
 
     var inputFiltro: String by rememberSaveable { mutableStateOf("") }
-    val guitarrasFiltradasState = remember { mutableStateOf(guitarras.toList()) }
-    val guitarrasFiltradasDerived = remember { derivedStateOf {
+    val guitarrasFiltradas = remember { derivedStateOf {
             guitarras.filter {
                 it.nombre
                     .lowercase()
@@ -128,39 +140,78 @@ fun ListadoGuitarras(
         }
     }
 
-    LaunchedEffect(key1 = inputFiltro) {
-        guitarrasFiltradasState.value = guitarras.filter {
-            it.nombre
-                .lowercase()
-                .contains(inputFiltro.lowercase())
-        }
-    }
+    val opcionesOrdenar = listOf("Ascendente", "Descendente")
+    var opcionElegida by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = modifier.padding(horizontal = 20.dp)) {
         item {
             OutlinedTextField(
                 modifier = modifierInput,
                 value = inputFiltro,
-                onValueChange = { value ->
-                    inputFiltro = value
-
-                                },
+                onValueChange = { inputFiltro = it},
                 label = { Text("Buscar guitarra por nombre") },
                 singleLine = true
             )
+
+            Box {
+                OutlinedTextField(
+                    value = opcionElegida,
+                    onValueChange = {},
+                    label = {
+                        Text(
+                            text = "Ordenar de forma...",
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = { Icon(Icons.Outlined.ArrowDropDown, null) },
+                    readOnly = true,
+                    shape = RoundedCornerShape(6.dp),
+                )
+
+                DropdownMenu(
+                    modifier = Modifier.fillMaxWidth(),
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    opcionesOrdenar.forEach { opcion ->
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                opcionElegida = opcion
+                                ordenar(opcion)
+                            },
+                            text = { Text(opcion) }
+                        )
+                    }
+                }
+                Spacer(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.Transparent)
+                        .padding(10.dp)
+                        .clickable(
+                            onClick = { expanded = !expanded }
+                        )
+                )
+            }
         }
 
-        items(guitarrasFiltradasDerived.value) { guitarra ->
+        items(guitarrasFiltradas.value, key = { it.key }) { guitarra ->
             Guitarra(guitarra, accion, guitarraCRUD)
         }
     }
 }
 
 @Composable
-fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: GuitarraCRUD) {
+fun Guitarra(
+    guitarra: Guitarra,
+    accion: AccionGuitarra?,
+    guitarraCRUD: GuitarraCRUD
+) {
     val contexto = LocalContext.current
 
-    val rating = remember { mutableFloatStateOf(guitarra.rating) }
+    val rating = remember { mutableFloatStateOf (guitarra.rating) }
     val url:String?=when(guitarra.urlImagen){
         "" -> null
         else -> guitarra.urlImagen
@@ -286,14 +337,14 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
                 fontSize = 14.sp
             )
 
-            StarRatingBar(modifier = Modifier
+            RatingBar(modifier = Modifier
                 .constrainAs(ratingBar){
                     bottom.linkTo(parent.bottom)
                     start.linkTo(imagen.end)
                     end.linkTo(precio.start)
                 },
-                maxStars = 5,
-                rating = rating.floatValue,
+                stars = 5,
+                rating = rating.value,
                 onRatingChanged = {
                     rating.floatValue = it
                 }
@@ -303,42 +354,39 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
 }
 
 @Composable
-fun StarRatingBar(
-    modifier: Modifier,
-    maxStars: Int = 5,
-    rating: Float,
-    onRatingChanged: (Float) -> Unit
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    rating: Float = 0f,
+    stars: Int = 5,
+    canChangeRating: Boolean = false,
+    onRatingChanged: (Float) -> Unit,
+    starsColor: Color = Color.Yellow
 ) {
-    val density = LocalDensity.current.density
-    val starSize = (12f * density).dp
-    val starSpacing = (0.5f * density).dp
+    var isHalfStar = (rating % 1) != 0f
 
-    Row(
-        modifier = modifier.selectableGroup(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        for (i in 1..maxStars) {
-            val isSelected = i <= rating
-            val icon = if (isSelected) Icons.Filled.Star else Icons.Default.Star
-            val iconTintColor = if (isSelected) Color(0xFFFFC700) else Color(0xFF222222)
+    Row(modifier = modifier) {
+        for (index in 1..stars) {
             Icon(
-                imageVector = icon,
+                imageVector =
+                if (index <= rating) {
+                    Icons.Rounded.Star
+                } else {
+                    if (isHalfStar) {
+                        isHalfStar = false
+                        Icons.Rounded.StarHalf
+                    } else {
+                        Icons.Rounded.StarOutline
+                    }
+                },
                 contentDescription = null,
-                tint = iconTintColor,
-                modifier = Modifier
-                    /*.selectable(
-                        selected = isSelected,
-                        onClick = {
-                            onRatingChanged(i.toFloat())
+                tint = starsColor,
+                modifier = modifier
+                    .clickable {
+                        if(canChangeRating){
+                            onRatingChanged(index.toFloat())
                         }
-                    )*/
-                    .width(starSize)
-                    .height(starSize)
+                    }
             )
-
-            if (i < maxStars) {
-                Spacer(modifier = Modifier.width(starSpacing))
-            }
         }
     }
 }
