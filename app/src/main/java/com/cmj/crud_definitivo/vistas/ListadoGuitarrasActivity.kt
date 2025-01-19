@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
@@ -25,12 +26,19 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,8 +112,45 @@ fun ListadoGuitarras(
     guitarraCRUD: GuitarraCRUD,
     accion: AccionGuitarra?
 ) {
-    LazyColumn(modifier = modifier) {
-        items(guitarras) { guitarra ->
+    val modifierInput = Modifier
+        .padding(vertical = 10.dp)
+        .wrapContentHeight()
+        .fillMaxWidth()
+
+    var inputFiltro: String by rememberSaveable { mutableStateOf("") }
+    val guitarrasFiltradasState = remember { mutableStateOf(guitarras.toList()) }
+    val guitarrasFiltradasDerived = remember { derivedStateOf {
+            guitarras.filter {
+                it.nombre
+                    .lowercase()
+                    .contains(inputFiltro.lowercase())
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = inputFiltro) {
+        guitarrasFiltradasState.value = guitarras.filter {
+            it.nombre
+                .lowercase()
+                .contains(inputFiltro.lowercase())
+        }
+    }
+
+    LazyColumn(modifier = modifier.padding(horizontal = 20.dp)) {
+        item {
+            OutlinedTextField(
+                modifier = modifierInput,
+                value = inputFiltro,
+                onValueChange = { value ->
+                    inputFiltro = value
+
+                                },
+                label = { Text("Buscar guitarra por nombre") },
+                singleLine = true
+            )
+        }
+
+        items(guitarrasFiltradasDerived.value) { guitarra ->
             Guitarra(guitarra, accion, guitarraCRUD)
         }
     }
@@ -123,17 +168,18 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
 
     Card(
         modifier = Modifier
-            .padding(vertical = 10.dp, horizontal = 20.dp)
+            .padding(vertical = 10.dp)
             .fillMaxWidth()
             .clickable {
-                if(accion != null){
-                    when(accion){
+                if (accion != null) {
+                    when (accion) {
                         AccionGuitarra.MODIFICAR -> {
                             val intent = Intent(contexto, PersistirGuitarraActivity::class.java)
                             intent.putExtra("guitarraIntent", guitarra)
 
                             contexto.startActivity(intent)
                         }
+
                         AccionGuitarra.BORRAR -> {
                             val builder: AlertDialog.Builder = AlertDialog.Builder(contexto)
                             builder
@@ -169,7 +215,7 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
             SubcomposeAsyncImage(
                 modifier = Modifier
                     .size(75.dp)
-                    .constrainAs(imagen){
+                    .constrainAs(imagen) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
@@ -189,7 +235,7 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
             Text(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .constrainAs(nombre){
+                    .constrainAs(nombre) {
                         top.linkTo(imagen.top)
                         start.linkTo(imagen.end)
                     },
@@ -200,7 +246,7 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
             Text(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .constrainAs(descripcion){
+                    .constrainAs(descripcion) {
                         top.linkTo(nombre.bottom)
                         start.linkTo(imagen.end)
                     },
@@ -211,7 +257,7 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
             Text(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .constrainAs(marca){
+                    .constrainAs(marca) {
                         top.linkTo(parent.top)
                         end.linkTo(modelo.start)
                     },
@@ -222,7 +268,7 @@ fun Guitarra(guitarra: Guitarra, accion: AccionGuitarra?, guitarraCRUD: Guitarra
             Text(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .constrainAs(modelo){
+                    .constrainAs(modelo) {
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
                     },
@@ -286,7 +332,8 @@ fun StarRatingBar(
                             onRatingChanged(i.toFloat())
                         }
                     )*/
-                    .width(starSize).height(starSize)
+                    .width(starSize)
+                    .height(starSize)
             )
 
             if (i < maxStars) {
