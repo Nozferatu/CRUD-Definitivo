@@ -5,4 +5,5 @@
     <string name="title_activity_listado_guitarras">ListadoGuitarrasActivity</string>
     <string name="title_activity_persistir_guitarra">PersistirGuitarraActivity</string>
     <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_chat">ChatActivity</string>
 </resources>

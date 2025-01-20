@@ -25,6 +25,7 @@ import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
+import com.cmj.crud_definitivo.vistas.ChatActivity
 import com.cmj.crud_definitivo.vistas.ListadoGuitarrasActivity
 import com.cmj.crud_definitivo.vistas.PersistirGuitarraActivity
 
@@ -106,6 +107,16 @@ fun Home(modifier: Modifier = Modifier) {
                 contexto.startActivity(intent)
             }
         ) { Text("Listar guitarras", color = Purple40) }
+
+        Button(
+            modifier = modifierBoton,
+            colors = colorBoton,
+
+            onClick = {
+                val intent = Intent(contexto, ChatActivity::class.java)
+                contexto.startActivity(intent)
+            }
+        ) { Text("Foro público", color = Purple40) }
     }
 }
 
