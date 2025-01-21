@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil.compose.SubcomposeAsyncImage
 import com.cmj.crud_definitivo.R
+import com.cmj.crud_definitivo.composables.RatingBar
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.Guitarra
 import com.cmj.crud_definitivo.hacerTostada
