@@ -56,12 +56,15 @@ class UsuarioCRUD(
 
                     if (usuarioPojo != null) {
                         if (usuario.nombre == usuarioPojo.nombre) {
+                            println("Existe")
                             callback(true)
 
                             break
                         }
                     }
                 }
+
+                callback(false)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -71,6 +74,8 @@ class UsuarioCRUD(
     }
 
     fun registrarUsuario(usuario: Usuario): String{
+        println("A")
+
         val idRef = databaseRef.child("usuarios").push().key!!
         usuario.key = idRef
 
