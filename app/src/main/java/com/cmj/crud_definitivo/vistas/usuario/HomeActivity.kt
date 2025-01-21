@@ -18,10 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cmj.crud_definitivo.entity.AccionGuitarra
+import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
 import com.cmj.crud_definitivo.ui.theme.Purple80
@@ -30,15 +30,20 @@ import com.cmj.crud_definitivo.vistas.ListadoGuitarrasActivity
 import com.cmj.crud_definitivo.vistas.PersistirGuitarraActivity
 
 class HomeActivity : ComponentActivity() {
+    private lateinit var sesion: Usuario
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        sesion = intent.getSerializableExtra("sesion") as Usuario
 
         setContent {
             CRUDDefinitivoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Home(
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        sesion
                     )
                 }
             }
@@ -47,7 +52,7 @@ class HomeActivity : ComponentActivity() {
 }
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Home(modifier: Modifier = Modifier, sesion: Usuario) {
     val contexto = LocalContext.current
     val modifierBoton = Modifier
         .width(200.dp)
@@ -114,16 +119,9 @@ fun Home(modifier: Modifier = Modifier) {
 
             onClick = {
                 val intent = Intent(contexto, ChatActivity::class.java)
+                intent.putExtra("sesion", sesion)
                 contexto.startActivity(intent)
             }
         ) { Text("Foro público", color = Purple40) }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 400, heightDp = 900)
-@Composable
-fun HomePreview() {
-    CRUDDefinitivoTheme {
-        Home()
     }
 }
