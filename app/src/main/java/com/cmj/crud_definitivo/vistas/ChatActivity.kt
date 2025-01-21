@@ -109,7 +109,7 @@ fun Chat(modifier: Modifier = Modifier, sesion: Usuario, chatCRUD: ChatCRUD) {
                         false -> Arrangement.Start
                     }
                 ) {
-                    MensajeItem(mensaje)
+                    MensajeItem(mensaje, esEmisor)
                 }
             }
         }
@@ -165,6 +165,7 @@ fun Chat(modifier: Modifier = Modifier, sesion: Usuario, chatCRUD: ChatCRUD) {
 
                     coroutineScope.launch {
                         chatCRUD.mandarMensaje(mensaje)
+                        contenidoMensaje = ""
                     }
                 }
             ) {
