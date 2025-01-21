@@ -102,9 +102,8 @@ class GuitarraCRUD(
 
     fun recuperarGuitarras(onDataReady: (List<Guitarra>) -> Unit) {
         val listaGuitarras = mutableListOf<Guitarra>()
-        val dbRef = Firebase.database.reference
 
-        dbRef.child("guitarras")
+        databaseRef.child("guitarras")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     listaGuitarras.clear()
