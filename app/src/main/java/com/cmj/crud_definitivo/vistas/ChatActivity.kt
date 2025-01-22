@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
@@ -74,6 +75,7 @@ class ChatActivity : ComponentActivity() {
 fun Chat(modifier: Modifier = Modifier, sesion: Usuario, chatCRUD: ChatCRUD) {
     val coroutineScope = rememberCoroutineScope()
     val listaMensajes = remember { mutableStateListOf<Mensaje>() }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -81,6 +83,12 @@ fun Chat(modifier: Modifier = Modifier, sesion: Usuario, chatCRUD: ChatCRUD) {
                 listaMensajes.clear()
                 listaMensajes.addAll(mensajes)
             }
+        }
+    }
+
+    LaunchedEffect(listaMensajes.size) {
+        if (listaMensajes.isNotEmpty()) {
+            listState.scrollToItem(listaMensajes.size - 1)
         }
     }
 
@@ -92,7 +100,8 @@ fun Chat(modifier: Modifier = Modifier, sesion: Usuario, chatCRUD: ChatCRUD) {
     ) {
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
-            .weight(1f)
+            .weight(1f),
+            state = listState
         ) {
             items(listaMensajes) { mensaje ->
                 val esEmisor = sesion.key == mensaje.idEmisor

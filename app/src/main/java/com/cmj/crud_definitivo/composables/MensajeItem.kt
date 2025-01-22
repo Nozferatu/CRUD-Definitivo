@@ -30,7 +30,10 @@ fun MensajeItem(mensaje: Mensaje, esEmisor: Boolean){
         .width(IntrinsicSize.Max)
         .padding(10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF367939)
+            containerColor = when(esEmisor){
+                true -> Color(0xFF367939)
+                false -> Color(0xCD009688)
+            }
         ),
         border = BorderStroke(1.dp, Color.Black)
     ) {
