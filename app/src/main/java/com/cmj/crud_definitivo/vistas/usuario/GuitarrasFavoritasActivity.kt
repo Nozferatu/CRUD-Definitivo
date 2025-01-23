@@ -136,6 +136,4 @@ fun GuitarrasFavoritas(
             ) { Text("Añadir guitarra", color = Purple40) }
         }
     }
-
-
 }
