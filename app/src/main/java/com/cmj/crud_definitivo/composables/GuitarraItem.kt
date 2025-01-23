@@ -26,14 +26,16 @@ import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.entity.Guitarra
+import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.hacerTostada
 import com.cmj.crud_definitivo.vistas.PersistirGuitarraActivity
 
 @Composable
 fun GuitarraItem(
     guitarra: Guitarra,
+    guitarraCRUD: GuitarraCRUD,
     accion: AccionGuitarra?,
-    guitarraCRUD: GuitarraCRUD
+    sesion: Usuario?
 ) {
     val contexto = LocalContext.current
 
@@ -64,6 +66,26 @@ fun GuitarraItem(
                                 .setMessage("¿Está seguro de que quiere borrar esta guitarra?")
                                 .setPositiveButton("Sí") { _, _ ->
                                     guitarraCRUD.borrarGuitarra(guitarra)
+                                }
+                                .setNegativeButton("No") { _, _ ->
+                                    hacerTostada(contexto, "Cancelado")
+                                }
+
+                            val dialog: AlertDialog = builder.create()
+                            dialog.show()
+                        }
+
+                        AccionGuitarra.AGREGAR_FAVORITA -> {
+                            guitarraCRUD.agregarGuitarraFavorita(guitarra, sesion!!)
+                        }
+
+                        AccionGuitarra.BORRAR_FAVORITA -> {
+                            val builder: AlertDialog.Builder = AlertDialog.Builder(contexto)
+                            builder
+                                .setTitle("Confirmación")
+                                .setMessage("¿Está seguro de que quiere borrar esta guitarra de sus favoritos?")
+                                .setPositiveButton("Sí") { _, _ ->
+                                    guitarraCRUD.borrarGuitarraFavorita(guitarra, sesion!!)
                                 }
                                 .setNegativeButton("No") { _, _ ->
                                     hacerTostada(contexto, "Cancelado")

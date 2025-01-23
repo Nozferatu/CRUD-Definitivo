@@ -118,6 +118,17 @@ fun Home(modifier: Modifier = Modifier, sesion: Usuario) {
             colors = colorBoton,
 
             onClick = {
+                val intent = Intent(contexto, GuitarrasFavoritasActivity::class.java)
+                intent.putExtra("sesion", sesion)
+                contexto.startActivity(intent)
+            }
+        ) { Text("Guitarras favoritas", color = Purple40) }
+
+        Button(
+            modifier = modifierBoton,
+            colors = colorBoton,
+
+            onClick = {
                 val intent = Intent(contexto, ChatActivity::class.java)
                 intent.putExtra("sesion", sesion)
                 contexto.startActivity(intent)

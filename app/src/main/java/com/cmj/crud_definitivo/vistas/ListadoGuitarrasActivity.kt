@@ -40,6 +40,7 @@ import com.cmj.crud_definitivo.composables.GuitarraItem
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.AccionGuitarra
 import com.cmj.crud_definitivo.entity.Guitarra
+import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
@@ -47,6 +48,7 @@ import com.google.firebase.database.database
 
 class ListadoGuitarrasActivity : ComponentActivity() {
     private var accion: AccionGuitarra? = null
+    private var sesion: Usuario? = null
     private lateinit var guitarraCRUD: GuitarraCRUD
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +75,7 @@ class ListadoGuitarrasActivity : ComponentActivity() {
         }
 
         accion = intent.getSerializableExtra("accion") as AccionGuitarra?
+        sesion = intent.getSerializableExtra("sesion") as Usuario?
 
         setContent {
             CRUDDefinitivoTheme {
@@ -82,6 +85,7 @@ class ListadoGuitarrasActivity : ComponentActivity() {
                         listaGuitarras,
                         guitarraCRUD,
                         accion,
+                        sesion,
                         ordenar = { opcion ->
                             when(opcion){
                                 "Ascendente" -> listaGuitarras.sortBy { it.rating }
@@ -105,6 +109,7 @@ fun ListadoGuitarras(
     guitarras: SnapshotStateList<Guitarra>,
     guitarraCRUD: GuitarraCRUD,
     accion: AccionGuitarra?,
+    sesion: Usuario?,
     ordenar: (opcion: String) -> Unit
 ) {
     val modifierInput = Modifier
@@ -180,7 +185,7 @@ fun ListadoGuitarras(
         }
 
         items(guitarrasFiltradas.value, key = { it.key }) { guitarra ->
-            GuitarraItem(guitarra, accion, guitarraCRUD)
+            GuitarraItem(guitarra,guitarraCRUD, accion, sesion)
         }
     }
 }

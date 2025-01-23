@@ -6,19 +6,19 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import com.cmj.crud_definitivo.entity.Guitarra
+import com.cmj.crud_definitivo.entity.Usuario
 import com.cmj.crud_definitivo.hacerTostada
-import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 import io.appwrite.Client
 import io.appwrite.ID
 import io.appwrite.models.InputFile
 import io.appwrite.services.Storage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.HashMap
 
 class GuitarraCRUD(
     private var contexto: Context,
@@ -84,6 +84,14 @@ class GuitarraCRUD(
         }
     }
 
+    fun agregarGuitarraFavorita(guitarra: Guitarra, usuario: Usuario){
+        val data = HashMap<String, Guitarra>()
+        data.put(guitarra.key, guitarra)
+        databaseRef.child("guitarras_favoritas").child(usuario.key).setValue(data)
+
+        hacerTostada(contexto, "Guitarra favorita añadida")
+    }
+
     fun borrarGuitarra(guitarra: Guitarra){
         //Se borra la imagen de AppWrite
         GlobalScope.launch {
@@ -100,10 +108,37 @@ class GuitarraCRUD(
         hacerTostada(contexto, "Guitarra borrada")
     }
 
+    fun borrarGuitarraFavorita(guitarra: Guitarra, sesion: Usuario){
+        databaseRef.child("guitarras_favoritas").child(sesion.key).child(guitarra.key).removeValue()
+
+        hacerTostada(contexto, "Guitarra favorita borrada")
+    }
+
     fun recuperarGuitarras(onDataReady: (List<Guitarra>) -> Unit) {
         val listaGuitarras = mutableListOf<Guitarra>()
 
         databaseRef.child("guitarras")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    listaGuitarras.clear()
+                    snapshot.children.forEach { child: DataSnapshot? ->
+                        val pojoGuitarra = child?.getValue(Guitarra::class.java)
+                        pojoGuitarra?.let { listaGuitarras.add(it) }
+                    }
+                    onDataReady(listaGuitarras)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    println(error.message)
+                }
+            })
+    }
+
+    fun recuperarGuitarrasFavoritas(usuario: Usuario, onDataReady: (List<Guitarra>) -> Unit) {
+        val listaGuitarras = mutableListOf<Guitarra>()
+
+        databaseRef.child("guitarras_favoritas")
+            .child(usuario.key)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     listaGuitarras.clear()
