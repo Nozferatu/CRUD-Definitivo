@@ -9,7 +9,7 @@ data class Guitarra(
     var urlImagen: String = "",
     var nombre: String = "",
     var descripcion: String = "",
-    var marca: String = "",
+    var marca: Marca = Marca(),
     var modelo: String = "",
     var rating: Float = 5f,
     var precio: Float = 100f

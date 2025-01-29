@@ -45,6 +45,7 @@ import com.cmj.crud_definitivo.R
 import com.cmj.crud_definitivo.composables.RatingBar
 import com.cmj.crud_definitivo.crud.GuitarraCRUD
 import com.cmj.crud_definitivo.entity.Guitarra
+import com.cmj.crud_definitivo.entity.Marca
 import com.cmj.crud_definitivo.hacerTostada
 import com.cmj.crud_definitivo.ui.theme.CRUDDefinitivoTheme
 import com.cmj.crud_definitivo.ui.theme.Purple40
@@ -112,7 +113,7 @@ fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier, activi
 
     var nombre: String by rememberSaveable { mutableStateOf(guitarra?.nombre ?: "") }
     var descripcion: String by rememberSaveable { mutableStateOf(guitarra?.descripcion ?: "") }
-    var marca: String by rememberSaveable { mutableStateOf(guitarra?.marca ?: "") }
+    var marca: String by rememberSaveable { mutableStateOf(guitarra?.marca?.nombre ?: "") }
     var modelo: String by rememberSaveable { mutableStateOf(guitarra?.modelo ?: "") }
     var precio: String by rememberSaveable { mutableStateOf(guitarra?.precio?.toString() ?: "") }
     val rating = remember { mutableFloatStateOf(guitarra?.rating ?: 5f) }
@@ -209,53 +210,59 @@ fun PersistirGuitarra(guitarra: Guitarra?, modifier: Modifier = Modifier, activi
                 onClick = {
                     if(nombre.isNotEmpty()){
                         if(url_imagen != null){
-                            val calendar = Calendar.getInstance()
-                            val fechaActual = StringBuilder()
-                                .append(calendar.get(Calendar.YEAR)).append("-")
-                                .append(calendar.get(Calendar.MONTH) + 1).append("-")
-                                .append(calendar.get(Calendar.DATE)).toString()
+                            guitarraCRUD.guitarraExistePorNombre(nombre){ existe ->
+                                if(!existe){
+                                    println(existe)
+                                    val calendar = Calendar.getInstance()
+                                    val fechaActual = StringBuilder()
+                                        .append(calendar.get(Calendar.YEAR)).append("-")
+                                        .append(calendar.get(Calendar.MONTH) + 1).append("-")
+                                        .append(calendar.get(Calendar.DATE)).toString()
 
-                            coroutineScope.launch{
-                                val idFile: String
+                                    coroutineScope.launch{
+                                        val idFile: String
 
-                                if(guitarra != null){
-                                    if(guitarra.urlImagen != url_imagen.toString()){
-                                        idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
-                                    }else{
-                                        idFile = guitarra.idImagen
+                                        if(guitarra != null){
+                                            if(guitarra.urlImagen != url_imagen.toString()){
+                                                idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
+                                            }else{
+                                                idFile = guitarra.idImagen
+                                            }
+                                        }else{
+                                            idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
+                                        }
+
+                                        val urlImagen =
+                                            "https://cloud.appwrite.io/v1/storage/buckets/$id_bucket/files/$idFile/preview?project=$id_proyecto"
+
+                                        val guitarraAPersistir = Guitarra(guitarra?.key ?: "",
+                                            fechaActual,
+                                            idFile,
+                                            urlImagen,
+                                            nombre,
+                                            descripcion,
+                                            Marca(nombre = marca),
+                                            modelo,
+                                            rating.floatValue,
+                                            precio.toFloatOrNull() ?: 0f
+                                        )
+
+                                        guitarraCRUD.persistirGuitarra(guitarraAPersistir)
+                                        activity.finish()
                                     }
-                                }else{
-                                    idFile = guitarraCRUD.guardarImagenGuitarra(url_imagen)
                                 }
-
-                                val urlImagen =
-                                    "https://cloud.appwrite.io/v1/storage/buckets/$id_bucket/files/$idFile/preview?project=$id_proyecto"
-
-                                val guitarraAPersistir = Guitarra(guitarra?.key ?: "",
-                                    fechaActual,
-                                    idFile,
-                                    urlImagen,
-                                    nombre,
-                                    descripcion,
-                                    marca,
-                                    modelo,
-                                    rating.floatValue,
-                                    precio.toFloatOrNull() ?: 0f
-                                )
-
-                                guitarraCRUD.persistirGuitarra(guitarraAPersistir)
-                                activity.finish()
                             }
                         }else hacerTostada(contexto, "Hay que elegir una imagen")
                     }else hacerTostada(contexto, "El nombre no puede estar vacío")
                 }
-            ) { Text(
-                text = when(guitarra) {
-                    null -> { "Agregar guitarra" }
-                    else -> { "Modificar guitarra" }
-                },
-                color = Purple40
-            )
+            ) {
+                Text(
+                    text = when(guitarra) {
+                        null -> { "Agregar guitarra" }
+                        else -> { "Modificar guitarra" }
+                    },
+                    color = Purple40
+                )
             }
         }
     }

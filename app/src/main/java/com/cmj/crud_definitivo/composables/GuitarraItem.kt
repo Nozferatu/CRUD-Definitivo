@@ -160,7 +160,7 @@ fun GuitarraItem(
                         top.linkTo(parent.top)
                         end.linkTo(modelo.start)
                     },
-                text = guitarra.marca,
+                text = guitarra.marca.nombre,
                 fontSize = 14.sp
             )
 

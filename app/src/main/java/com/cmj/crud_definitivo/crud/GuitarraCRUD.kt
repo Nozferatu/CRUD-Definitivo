@@ -114,6 +114,30 @@ class GuitarraCRUD(
         hacerTostada(contexto, "Guitarra favorita borrada")
     }
 
+    fun guitarraExistePorNombre(nombre: String, existe: (Boolean) -> Unit){
+        var nombreCoincide = false
+
+        databaseRef.child("guitarras")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for(child: DataSnapshot? in snapshot.children) {
+                        val pojoGuitarra = child?.getValue(Guitarra::class.java)
+
+                        if(pojoGuitarra?.nombre.equals(nombre)){
+                            nombreCoincide = true
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    println(error.message)
+                    existe(false)
+                }
+            })
+
+        existe(nombreCoincide)
+    }
+
     fun recuperarGuitarras(onDataReady: (List<Guitarra>) -> Unit) {
         val listaGuitarras = mutableListOf<Guitarra>()
 
